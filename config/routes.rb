@@ -1,4 +1,6 @@
 ProjectTutorial::Application.routes.draw do
+  resources :posts
+
   resources :tasks
 
   # The priority is based upon order of creation:

@@ -29,6 +29,7 @@ GEM
       activesupport (= 3.0.3)
     activesupport (3.0.3)
     arel (2.0.6)
+    bson (1.1.5)
     builder (2.1.2)
     erubis (2.6.6)
       abstract (>= 1.0.0)
@@ -44,6 +45,13 @@ GEM
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
     mime-types (1.16)
+    mongo (1.1.5)
+      bson (>= 1.1.5)
+    mongoid (2.0.0.rc.4)
+      activemodel (~> 3.0)
+      mongo (~> 1.1.5)
+      tzinfo (~> 0.3.22)
+      will_paginate (~> 3.0.pre)
     polyglot (0.3.1)
     rack (1.2.1)
     rack-mount (0.6.13)
@@ -69,6 +77,7 @@ GEM
     treetop (1.4.9)
       polyglot (>= 0.3.1)
     tzinfo (0.3.23)
+    will_paginate (3.0.pre2)
     wrest (1.0.0.beta7)
       activesupport (~> 3.0.0)
       builder (~> 2.1.2)
@@ -80,6 +89,7 @@ PLATFORMS
 DEPENDENCIES
   jquery-rails
   libxml-ruby
+  mongoid (~> 2.0.0.rc)
   rails (= 3.0.3)
   sqlite3-ruby
   wrest (~> 1.0.beta)

@@ -9,6 +9,8 @@ gem 'sqlite3-ruby', :require => 'sqlite3'
 gem 'wrest', '~>1.0.beta'
 gem 'libxml-ruby'
 gem "jquery-rails"
+gem "mongoid", '~>2.0.0.rc'
+
 # Use unicorn as the web server
 # gem 'unicorn'
 
