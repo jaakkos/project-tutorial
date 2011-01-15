@@ -80,4 +80,24 @@ class PostsController < ApplicationController
       format.xml  { head :ok }
     end
   end
+  
+  def publish
+    if session[:access_token]
+      @post = Post.find(params[:id])
+      options = 
+      publication_place = params[:publication_place]
+      request_params = {
+        :access_token => session[:access_token]
+      }.merge(options)
+      response = base_url["#{publication_place}/feed"].post_form(request_params).deserialise
+      response['data']['']
+    end
+  end
+  
+  private
+  
+  def base_url
+    "https://graph.facebook.com".to_uri
+  end
+  
 end
