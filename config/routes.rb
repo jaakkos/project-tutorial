@@ -1,7 +1,13 @@
 ProjectTutorial::Application.routes.draw do
-  resources :posts
+  resources :posts do
+    member do
+     put 'publish' 
+    end
+  end
+  
+  match 'access_to_facebook' => 'facebook_authentication#request_access_grant'
 
-  resources :tasks
+  root :to => "facebook_authentication#request_access_grant"
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

@@ -9,11 +9,14 @@ class FacebookAuthenticationController < ApplicationController
     authentication_code = params[:code]
     access_token = make_access_token_retrive_request(authentication_code)
     session[:access_token] = access_token
+    redirect_to :action => :verify_access_token
   end
   
-  # Step 3-
+  # Step 3.
   def verify_access_token
     @response = generate_verify_uri(session[:access_token]).get
+    session[:user_id] = @response['id']
+    redirect_to posts_path
   end
 
 protected

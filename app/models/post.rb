@@ -1,13 +1,16 @@
 class Post < ActiveRecord::Base
-  # Expresses that this class is a Mongoid document
+    # Expresses that this class is a Mongoid document
     include Mongoid::Document
-  #include Mongoid::TimeStamps
-    #field :user, :type => ObjectId
+    include Mongoid::Timestamps
+    
+    field :user, :type => String
     field :external_id, :type => String
-    # Default type is string
+    field :publish_place_id, :type => String
+
     field :message
     field :comments, :type => Hash
     field :likes, :type => Hash
+    field :published, :type => Boolean
 
     def self.by_likes(user)
       map <<-eos 
@@ -34,6 +37,25 @@ class Post < ActiveRecord::Base
       reduce, { :query => { :user => user }, 
       :out => "Post.by_likes(#{user})"})
     
-    @likes_by_user.find.inject(Hash.new(0)) {|h, i| h[i.values[0].to_date] = i.values[1]; h}
+    @likes_by_user.find.inject(Hash.new(0)) {|h, i| h[i.values[0]] = i.values[1]; h}
   end
+  
+  def publish_to(place, access_token)
+    request_params = {
+      :access_token => access_token,
+      :message => message 
+    }
+    response = base_url["#{place}/feed"].post_form(request_params).deserialise
+    self.external_id = response['id']      
+    self.publish_place_id = place
+    self.published = true
+  end
+  
+  
+  protected
+  
+  def base_url
+    "https://graph.facebook.com".to_uri
+  end  
+  
 end

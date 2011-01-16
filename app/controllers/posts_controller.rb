@@ -1,103 +1,74 @@
 class PostsController < ApplicationController
+  
+  before_filter :facebook_session_ok?
+  before_filter :find_post, :only => [:show, :edit, :update, :destroy, :publish]
+  respond_to :html, :xml, :json
+  
   # GET /posts
   # GET /posts.xml
+  # GET /posts.json
   def index
-    @posts = Post.all
-
-    respond_to do |format|
-      format.html # index.html.erb
-      format.xml  { render :xml => @posts }
-    end
+    respond_with(@posts = Post.find(:all, :conditions => { :user => session[:user_id]}))
   end
 
   # GET /posts/1
   # GET /posts/1.xml
+  # GET /posts/1.json
   def show
-    @post = Post.find(params[:id])
-
-    respond_to do |format|
-      format.html # show.html.erb
-      format.xml  { render :xml => @post }
-    end
+    respond_with(@post)
   end
 
   # GET /posts/new
   # GET /posts/new.xml
   def new
-    @post = Post.new
-
-    respond_to do |format|
-      format.html # new.html.erb
-      format.xml  { render :xml => @post }
-    end
+    respond_with(@post = Post.new)
   end
 
   # GET /posts/1/edit
-  def edit
-    @post = Post.find(params[:id])
-  end
+  def edit; end
 
   # POST /posts
   # POST /posts.xml
   def create
-    @post = Post.new(params[:post])
-
-    respond_to do |format|
-      if @post.save
-        format.html { redirect_to(@post, :notice => 'Post was successfully created.') }
-        format.xml  { render :xml => @post, :status => :created, :location => @post }
-      else
-        format.html { render :action => "new" }
-        format.xml  { render :xml => @post.errors, :status => :unprocessable_entity }
-      end
-    end
+    @post = Post.create(params[:post])
+    respond_with(@post, :location => post_path(@post))
   end
 
   # PUT /posts/1
   # PUT /posts/1.xml
   def update
-    @post = Post.find(params[:id])
-
-    respond_to do |format|
-      if @post.update_attributes(params[:post])
-        format.html { redirect_to(@post, :notice => 'Post was successfully updated.') }
-        format.xml  { head :ok }
-      else
-        format.html { render :action => "edit" }
-        format.xml  { render :xml => @post.errors, :status => :unprocessable_entity }
-      end
-    end
+    @post.update_attributes(params[:post])
+    respond_with(@post, :location => post_path(@post))
   end
 
   # DELETE /posts/1
   # DELETE /posts/1.xml
   def destroy
-    @post = Post.find(params[:id])
     @post.destroy
-
-    respond_to do |format|
-      format.html { redirect_to(posts_url) }
-      format.xml  { head :ok }
-    end
+    respond_with(@post, :location => posts_path)
   end
   
+  # PUT /posts/1/publish
   def publish
     if session[:access_token]
       @post = Post.find(params[:id])
-      options = 
-      publication_place = params[:publication_place]
-      request_params = {
-        :access_token => session[:access_token]
-      }.merge(options)
-      response = base_url["#{publication_place}/feed"].post_form(request_params).deserialise
-      response['data']['']
+      @post.publish_to params[:publish_place], session[:access_token]
+      @post.save
+    end
+    respond_with(@post, :location => posts_path)
+  end
+  
+  protected
+  
+  def find_post
+    @pos = Post.find(params[:id])
+  end
+  
+  def facebook_session_ok?
+    unless session[:access_token] and session[:user_id]
+      redirect_to access_to_facebook_url
     end
   end
   
-  private
-  
-  def base_url
-    "https://graph.facebook.com".to_uri
-  end
   
 end
